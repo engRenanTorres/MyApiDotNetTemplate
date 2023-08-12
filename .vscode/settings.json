@@ -1,0 +1,9 @@
+{
+  "dotnet.defaultSolution": "DotnetAPI.sln",
+  "editor.indentSize": "tabSize",
+  "editor.tabSize": 2,
+  // Enable per-language
+  "[csharp]": {
+      "editor.formatOnSave": true
+  },
+}

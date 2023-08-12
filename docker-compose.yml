@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+  mssql:
+    #platform: linux/arm64/v8
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sqlserver_dev
+    environment:
+      SA_PASSWORD: "JDOIWS!@snu1k!cnsi!sakjqbwejo" # Defina sua senha do SQL Server aqui
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - .docker/sqlserver_data:/tmp/mssql
