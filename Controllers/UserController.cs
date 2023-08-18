@@ -20,7 +20,7 @@ public class UserController : ControllerBase
     _logger = logger;
     _userRepository = userRepository;
   }
-  [HttpPost("")]
+  /*[HttpPost("")]
   public async Task<ActionResult<User>> CreateUser(CreateUserDTO userDTO)
   {
     _logger.LogInformation("CreateUser has been called.");
@@ -47,7 +47,7 @@ public class UserController : ControllerBase
     }
     throw new Exception("Error to Add this User");
 
-  }
+  }*/
 
   [HttpGet("{id}")]
   public async Task<ActionResult<User>> GetUser(int id)

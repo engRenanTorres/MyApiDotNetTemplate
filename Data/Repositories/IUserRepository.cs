@@ -8,4 +8,5 @@ public interface IUserRepository
   public void RemoveEntity<T>(T entity);
   public Task<IEnumerable<User?>> GetAllUsers();
   public Task<User?> GetSingleUser(int id);
+  public Task<User?> GetSingleUserByEmail(string email);
 }

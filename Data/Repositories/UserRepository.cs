@@ -48,4 +48,13 @@ class UserRepository : IUserRepository
     }
     throw new Exception("Users repo is not set");
   }
+  public async Task<User?> GetSingleUserByEmail(string email)
+  {
+    if (_context.Users != null)
+    {
+      User? user = await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
+      return user;
+    }
+    throw new Exception("Users repo is not set");
+  }
 }
