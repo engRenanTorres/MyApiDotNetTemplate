@@ -3,6 +3,7 @@ using System;
 using DotnetAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DotnetAPI.Migrations
 {
     [DbContext(typeof(DataContextEF))]
-    partial class DataContextEFModelSnapshot : ModelSnapshot
+    [Migration("20230822221123_oneToManyQuestionUser")]
+    partial class oneToManyQuestionUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,10 +28,7 @@ namespace DotnetAPI.Migrations
             modelBuilder.Entity("DotnetAPI.Models.Question", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<char>("Answer")
                         .HasColumnType("character(1)");
@@ -41,9 +41,6 @@ namespace DotnetAPI.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("Created_at");
 
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("LastUpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("Last_updated_at");
@@ -52,8 +49,6 @@ namespace DotnetAPI.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
 
                     b.ToTable("Questions", (string)null);
                 });
@@ -100,7 +95,7 @@ namespace DotnetAPI.Migrations
                 {
                     b.HasOne("DotnetAPI.Models.User", "CreatedBy")
                         .WithMany("Questions")
-                        .HasForeignKey("CreatedById")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

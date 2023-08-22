@@ -6,9 +6,9 @@ public class Question
 {
     [Key]
     public int Id { get; set; }
-    [Column(name:"Created_at")]
+    [Column(name: "Created_at")]
     public DateTime CreatedAt { get; set; }
-    [Column(name:"Last_updated_at")]
+    [Column(name: "Last_updated_at")]
     public DateTime LastUpdatedAt { get; set; }
 
     public string Body { get; set; } = "";
@@ -16,4 +16,5 @@ public class Question
     public char Answer { get; set; }
 
     public string? Tip { get; set; } = "";
+    public required User CreatedBy { get; set; }
 }

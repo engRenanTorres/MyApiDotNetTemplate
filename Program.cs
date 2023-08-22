@@ -1,8 +1,10 @@
+using System.Text;
 using DotnetAPI;
 using DotnetAPI.Data;
 using DotnetAPI.Data.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +53,22 @@ builder.Services.AddCors((options) =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 
+string? tokenKeyString = builder.Configuration.GetSection("AppSettings:TokenKey").Value;
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+      options.TokenValidationParameters = new TokenValidationParameters()
+      {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                  tokenKeyString != null ? tokenKeyString : ""
+              )),
+        ValidateIssuer = false,
+        ValidateAudience = false
+      };
+    });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -68,6 +86,7 @@ if (app.Environment.IsProduction())
 }
 
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

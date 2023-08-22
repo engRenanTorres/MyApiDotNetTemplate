@@ -2,6 +2,7 @@ using DotnetAPI.Data;
 using DotnetAPI.Data.Repositories;
 using DotnetAPI.DTOs;
 using DotnetAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,7 @@ namespace DotnetAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+//[Authorize]
 public class UserController : ControllerBase
 {
 
@@ -67,7 +69,7 @@ public class UserController : ControllerBase
     return Ok(users);
   }
 
-  [HttpPatch("{id}")]
+  /*[HttpPatch("{id}")]
   public async Task<ActionResult<User>> PatchUser(int id, [FromBody] UpdateUserDTO updateUserDTO)
   {
     _logger.LogInformation("PatchUsers has been called.");
@@ -87,6 +89,25 @@ public class UserController : ControllerBase
     }
     throw new Exception("Error to update User");
 
+  }*/
+  [HttpPatch]
+  public async Task<ActionResult<User>> PatchUser([FromBody] UpdateUserDTO updateUserDTO)
+  {
+    _logger.LogInformation("PatchUsers has been called.");
+    string? userId = User?.FindFirst("userId")?.Value;
+
+    if (userId == null) return NotFound("User id: " + userId + "not found");
+
+    User? user = await _userRepository.GetSingleUser(int.Parse(userId));
+    if (user == null) return NotFound("User id: " + userId + "not found");
+    if (updateUserDTO.Name != null) user.Name = updateUserDTO.Name;
+    if (updateUserDTO.Email != null) user.Email = updateUserDTO.Email;
+
+    if (await _userRepository.SaveChanges())
+    {
+      return Ok(user);
+    }
+    throw new Exception("Error to update User");
   }
 
   [HttpDelete("{id}")]

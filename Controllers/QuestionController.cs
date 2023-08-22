@@ -2,6 +2,7 @@ using DotnetAPI.Data;
 using DotnetAPI.Data.Repositories;
 using DotnetAPI.DTOs;
 using DotnetAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,32 +11,40 @@ namespace DotnetAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class QuestionController : ControllerBase
 {
   private readonly ILogger<QuestionController> _logger;
   private readonly IQuestionRepository _questionRepository;
+  // TODO remove and use userService
+  private readonly IUserRepository _userRepository;
 
-  public QuestionController(ILogger<QuestionController> logger, IQuestionRepository repository)
+  public QuestionController(ILogger<QuestionController> logger, IQuestionRepository repository, IUserRepository userRepository)
   {
     _logger = logger;
     _questionRepository = repository;
+    _userRepository = userRepository;
   }
   [HttpPost("")]
   public async Task<ActionResult<Question>> CreateQuestion(CreateQuestionDTO questionDTO)
   {
     _logger.LogInformation("CreateQuestion has been called.");
 
-    if (questionDTO == null)
-    {
-      return BadRequest("Question data is null.");
-    }
+    if (questionDTO == null) return BadRequest("Question data is null.");
+    string? userId = User?.FindFirst("userId")?.Value;
+
+    if (userId == null) return BadRequest("User id: " + userId + "not found");
+
+    User? user = await _userRepository.GetSingleUser(int.Parse(userId));
+    if (user == null) return NotFound("Not found user to create the question");
 
     Question question = new()
     {
       Body = questionDTO.Body,
       Answer = questionDTO.Answer,
       Tip = questionDTO.Tip,
-      CreatedAt = DateTime.UtcNow
+      CreatedAt = DateTime.UtcNow,
+      CreatedBy = user,
     };
 
 
@@ -48,7 +57,7 @@ public class QuestionController : ControllerBase
     throw new Exception("Error to Add this Question");
 
   }
-
+  [AllowAnonymous]
   [HttpGet("{id}")]
   public async Task<ActionResult<Question>> GetQuestion(int id)
   {
@@ -59,6 +68,7 @@ public class QuestionController : ControllerBase
     return Ok(question);
   }
 
+  [AllowAnonymous]
   [HttpGet("")]
   public async Task<ActionResult<IEnumerable<Question>>> GetQuestions()
   {

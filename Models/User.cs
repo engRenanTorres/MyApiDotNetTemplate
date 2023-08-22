@@ -14,5 +14,6 @@ public class User : Contactable
 
     public string Name { get; set; } = "";
     public required byte[] Password { get; set; }
+    public ICollection<Question> Questions { get; } = new List<Question>();
 }
 
