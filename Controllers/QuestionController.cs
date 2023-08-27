@@ -1,7 +1,8 @@
 
-using DotnetAPI.Data.Repositories;
+using System.ComponentModel;
 using DotnetAPI.DTOs;
 using DotnetAPI.Models;
+using DotnetAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,15 +15,15 @@ namespace DotnetAPI.Controllers;
 public class QuestionController : ControllerBase
 {
   private readonly ILogger<QuestionController> _logger;
-  private readonly IQuestionRepository _questionRepository;
-  // TODO remove and use userService
-  private readonly IUserRepository _userRepository;
+  private readonly IQuestionService _questionService;
 
-  public QuestionController(ILogger<QuestionController> logger, IQuestionRepository repository, IUserRepository userRepository)
+  public QuestionController(
+    ILogger<QuestionController> logger,
+    IQuestionService questionService
+  )
   {
     _logger = logger;
-    _questionRepository = repository;
-    _userRepository = userRepository;
+    _questionService = questionService;
   }
   [HttpPost("")]
   public async Task<ActionResult<Question>> CreateQuestion(CreateQuestionDTO questionDTO)
@@ -31,42 +32,25 @@ public class QuestionController : ControllerBase
 
     if (questionDTO == null) return BadRequest("Question data is null.");
     string? userId = User?.FindFirst("userId")?.Value;
-
-    if (userId == null) return BadRequest("User id: " + userId + "not found");
-
-    User? user = await _userRepository.GetSingleUser(int.Parse(userId));
-    if (user == null) return NotFound("Not found user to create the question");
-    Console.WriteLine($"----------- aqui ========= {user.Name}");
-
-    Question question = new()
-    {
-      Body = questionDTO.Body,
-      Answer = questionDTO.Answer,
-      Tip = questionDTO.Tip,
-      CreatedAt = DateTime.UtcNow,
-      LastUpdatedAt = DateTime.UtcNow,
-      CreatedBy = user,
-    };
-
-
-    _questionRepository.AddEntity(question);
-    // _constext.SaveChanges return de number of rows that were modified.
-    if (await _questionRepository.SaveChanges())
-    {
-      return CreatedAtAction(nameof(GetQuestion), new { id = question.Id }, question);
-    }
-    throw new Exception("Error to Add this Question");
+    if (userId == null) return BadRequest("Please log a user");
+    Question? question =
+      await _questionService.CreateQuestion(questionDTO, userId);
+    return question != null ?
+      Ok(question) :
+      BadRequest("Question has Not been Created");
 
   }
   [AllowAnonymous]
   [HttpGet("{id}")]
   public async Task<ActionResult<Question>> GetQuestion(int id)
   {
-    _logger.LogInformation("GetQuestions has been called.");
+    _logger.LogInformation("GetQuestion has been called.");
 
-    Question? question = await _questionRepository.GetSingleQuestion(id);
+    Question? question = await _questionService.GetQuestion(id);
 
-    return Ok(question);
+    return question != null ?
+      Ok(question) :
+      NotFound("Question id: " + id + "not found");
   }
 
   [AllowAnonymous]
@@ -74,7 +58,7 @@ public class QuestionController : ControllerBase
   public async Task<ActionResult<IEnumerable<Question>>> GetQuestions()
   {
     _logger.LogInformation("GetQuestions has been called.");
-    IEnumerable<Question?> questions = await _questionRepository.GetAllQuestions();
+    IEnumerable<Question?> questions = await _questionService.GetAllQuestions();
 
     return Ok(questions);
   }
@@ -83,47 +67,25 @@ public class QuestionController : ControllerBase
   public async Task<ActionResult<Question>> PatchQuestion(int id, [FromBody] UpdateQuestionDTO updateQuestionDTO)
   {
     _logger.LogInformation("PatchQuestions has been called.");
-    Question? question = await _questionRepository.GetSingleQuestion(id);
-    if (question == null)
-      if (question == null)
+    try
+    {
+      var updatedQuestion = await _questionService.PatchQuestion(id, updateQuestionDTO);
+
+      return Ok(updatedQuestion);
+    }
+    catch (Exception ex)
+    {
+      if (ex is WarningException)
       {
+        _logger.LogError(ex, "Question not found while deleting.");
         return NotFound("Question id: " + id + "not found");
       }
-    if (updateQuestionDTO.Body != null) question.Body = updateQuestionDTO.Body;
-    if (updateQuestionDTO.Answer != null) question.Answer = (char)updateQuestionDTO.Answer;
-    if (updateQuestionDTO.Tip != null) question.Tip = updateQuestionDTO.Tip;
-    question.LastUpdatedAt = DateTime.UtcNow;
-
-    if (await _questionRepository.SaveChanges())
-    {
-      return Ok(question);
+      _logger.LogError(ex, "An error occurred while deleting the question.");
     }
-    throw new Exception("Error to update Question");
-  }
-
-  [HttpDelete("{id}")]
-  public async Task<ActionResult> DeleteQuestion(int id)
-  {
-    _logger.LogInformation("DeleteQuestion has been called.");
-
-    Question? question = await _questionRepository.GetSingleQuestion(id);
-
-    if (question == null)
-    {
-      return NotFound("Question id: " + id + "not found");
-    }
-
-    _questionRepository.RemoveEntity<Question>(question);
-    if (await _questionRepository.SaveChanges())
-    {
-      return NoContent();
-    };
     throw new Exception("Error to delete Question");
-
-
   }
-}
-/*
+
+
   [HttpDelete("{id}")]
   public async Task<ActionResult> DeleteQuestion(int id)
   {
@@ -148,4 +110,5 @@ public class QuestionController : ControllerBase
     }
     throw new Exception("Error to delete Question");
   }
-*/
+}
+
