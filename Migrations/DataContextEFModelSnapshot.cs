@@ -55,7 +55,7 @@ namespace DotnetAPI.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.ToTable("Questions", (string)null);
+                    b.ToTable("Questions");
                 });
 
             modelBuilder.Entity("DotnetAPI.Models.User", b =>
@@ -93,7 +93,7 @@ namespace DotnetAPI.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("DotnetAPI.Models.Question", b =>

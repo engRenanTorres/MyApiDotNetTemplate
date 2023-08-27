@@ -33,7 +33,10 @@ class QuestionRepository : IQuestionRepository
   {
     if (_context.Questions != null)
     {
-      IEnumerable<Question?> questions = await _context.Questions.ToListAsync();
+      IEnumerable<Question?> questions = await _context.Questions
+        .Include(q => q.CreatedBy)
+        .AsQueryable()
+        .ToListAsync();
 
       return questions;
     }
@@ -43,7 +46,9 @@ class QuestionRepository : IQuestionRepository
   {
     if (_context.Questions != null)
     {
-      Question? question = await _context.Questions.SingleOrDefaultAsync(u => u.Id == id);
+      Question? question = await _context.Questions
+        .Include(q => q.CreatedBy)
+        .FirstOrDefaultAsync(u => u.Id == id);
       return question;
     }
     throw new Exception("Questions repo is not set");

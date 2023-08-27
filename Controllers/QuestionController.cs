@@ -1,10 +1,9 @@
-using DotnetAPI.Data;
+
 using DotnetAPI.Data.Repositories;
 using DotnetAPI.DTOs;
 using DotnetAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 
 namespace DotnetAPI.Controllers;
@@ -37,6 +36,7 @@ public class QuestionController : ControllerBase
 
     User? user = await _userRepository.GetSingleUser(int.Parse(userId));
     if (user == null) return NotFound("Not found user to create the question");
+    Console.WriteLine($"----------- aqui ========= {user.Name}");
 
     Question question = new()
     {
@@ -44,6 +44,7 @@ public class QuestionController : ControllerBase
       Answer = questionDTO.Answer,
       Tip = questionDTO.Tip,
       CreatedAt = DateTime.UtcNow,
+      LastUpdatedAt = DateTime.UtcNow,
       CreatedBy = user,
     };
 
@@ -122,3 +123,29 @@ public class QuestionController : ControllerBase
 
   }
 }
+/*
+  [HttpDelete("{id}")]
+  public async Task<ActionResult> DeleteQuestion(int id)
+  {
+    _logger.LogInformation("Delete Question Controller has been called.");
+
+    try
+    {
+      var deleteQuestion = await _questionService.DeleteQuestion(id);
+      if (deleteQuestion)
+      {
+        return NoContent();
+      };
+    }
+    catch (Exception ex)
+    {
+      if (ex is WarningException)
+      {
+        _logger.LogError(ex, "Question not found while deleting.");
+        return NotFound("Question id: " + id + "not found");
+      }
+      _logger.LogError(ex, "An error occurred while deleting the question.");
+    }
+    throw new Exception("Error to delete Question");
+  }
+*/

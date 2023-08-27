@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DotnetAPI.Migrations
 {
     [DbContext(typeof(DataContextEF))]
-    [Migration("20230822221338_undo")]
-    partial class undo
+    [Migration("20230826213406_first")]
+    partial class first
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -58,7 +58,7 @@ namespace DotnetAPI.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.ToTable("Questions", (string)null);
+                    b.ToTable("Questions");
                 });
 
             modelBuilder.Entity("DotnetAPI.Models.User", b =>
@@ -96,7 +96,7 @@ namespace DotnetAPI.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("DotnetAPI.Models.Question", b =>

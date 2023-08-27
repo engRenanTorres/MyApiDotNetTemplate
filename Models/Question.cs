@@ -1,6 +1,7 @@
 namespace DotnetAPI.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 public class Question
 {
@@ -16,5 +17,8 @@ public class Question
     public char Answer { get; set; }
 
     public string? Tip { get; set; } = "";
-    public required User CreatedBy { get; set; }
+    public int CreatedById { get; set; }
+    //[JsonIgnore]
+    //[ForeignKey("Users")]
+    public User? CreatedBy { get; set; }
 }

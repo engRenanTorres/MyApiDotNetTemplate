@@ -33,7 +33,7 @@ class UserRepository : IUserRepository
   {
     if (_context.Users != null)
     {
-      IEnumerable<User?> users = await _context.Users.ToListAsync();
+      IEnumerable<User?> users = await _context.Users.Include(u => u.Questions).ToListAsync();
 
       return users;
     }
