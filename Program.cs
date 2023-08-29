@@ -4,6 +4,7 @@ using DotnetAPI.Data;
 using DotnetAPI.Data.Repositories;
 using DotnetAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -11,6 +12,15 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+/*builder.Services.AddAuthorization(options =>
+{
+  options.AddPolicy("ElevatedRights", policy =>
+        policy.RequireRole("Administrator", "PowerUser", "BackupAdministrator"));
+  options.AddPolicy("AdminOnly", policy =>
+        policy.RequireClaim("Role", "Adm")
+    );
+});*/
 
 builder.Services.AddControllers()
   .AddJsonOptions(options =>
@@ -45,6 +55,7 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+
 builder.Services
   .AddEntityFrameworkNpgsql()
   .AddDbContext<DataContextEF>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -69,9 +80,11 @@ builder.Services.AddCors((options) =>
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 
 string? tokenKeyString = builder.Configuration.GetSection("AppSettings:TokenKey").Value;
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -86,6 +99,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         ValidateAudience = false
       };
     });
+
 
 var app = builder.Build();
 

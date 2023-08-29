@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using DotnetAPI.Enums;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.IdentityModel.Tokens;
 
@@ -30,7 +31,8 @@ namespace DotnetAPI.Helpers
     public string TokenGenerator(int userId)
     {
       var claims = new Claim[]{
-      new Claim("userId", userId.ToString())
+      new Claim("userId", userId.ToString()),
+      new Claim("trampo", "Jeca")
     };
       string? tokenKeyString = _configuration.GetSection("AppSettings:TokenKey").Value;
 
@@ -42,7 +44,7 @@ namespace DotnetAPI.Helpers
       SigningCredentials signingCredentials = new(tokenKey, SecurityAlgorithms.HmacSha256Signature);
       SecurityTokenDescriptor descriptor = new()
       {
-        Subject = new ClaimsIdentity(claims),
+        Subject = new ClaimsIdentity(claims, null, nameType: "null", roleType: "role"),
         SigningCredentials = signingCredentials,
         Expires = DateTime.Now.AddDays(1)
       };
