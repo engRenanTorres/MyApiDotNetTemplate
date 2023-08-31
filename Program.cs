@@ -82,6 +82,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 string? tokenKeyString = builder.Configuration.GetSection("AppSettings:TokenKey").Value;
 

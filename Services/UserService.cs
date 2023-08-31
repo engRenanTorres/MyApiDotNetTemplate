@@ -42,6 +42,12 @@ public class UserService : IUserService
     User? user = await _userRepository.GetSingleUser(id);
     return user;
   }
+  async public Task<User?> GetUserByEmail(string email)
+  {
+    _logger.LogInformation("GetUsers Service has been called.");
+    User? user = await _userRepository.GetSingleUserByEmail(email);
+    return user;
+  }
 
   async public Task<User?> PatchUser(string? userId, [FromBody] UpdateUserDTO updateUserDTO)
   {
