@@ -32,13 +32,14 @@ public class AuthController : ControllerBase
 
   [AllowAnonymous]
   [HttpPost("Resgister")]
-  public async Task<IActionResult> Register([FromBody] CreateUserDTO createUserDTO)
+  [ProducesResponseType(StatusCodes.Status201Created)]
+  public async Task<ActionResult<User>> Register([FromBody] CreateUserDTO createUserDTO)
   {
     User? user = await _AuthService.Register(createUserDTO);
     // _constext.SaveChanges return de number of rows that were modified.
     if (user != null)
     {
-      return Ok("CRIADO!");
+      return Created("CRIADO!", user);
     }
 
     throw new Exception("Error to Add this User");
@@ -46,7 +47,9 @@ public class AuthController : ControllerBase
 
   [AllowAnonymous]
   [HttpPost("Login")]
-  public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
+  [ProducesResponseType(StatusCodes.Status200OK)]
+  [ProducesResponseType(StatusCodes.Status400BadRequest)]
+  public async Task<ActionResult<Dictionary<string, string>>> Login([FromBody] LoginDTO loginDTO)
   {
     var token = await _AuthService.Login(loginDTO);
     if (token == null) return BadRequest("Invalid email or password.");

@@ -33,7 +33,7 @@ public class QuestionService : IQuestionService
     Question question = new()
     {
       Body = questionDTO.Body,
-      Answer = questionDTO.Answer,
+      Answer = questionDTO.Answer.ToCharArray()[0],
       Tip = questionDTO.Tip,
       CreatedAt = DateTime.UtcNow,
       LastUpdatedAt = DateTime.UtcNow,

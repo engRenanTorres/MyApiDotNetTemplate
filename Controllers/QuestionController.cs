@@ -29,6 +29,10 @@ public class QuestionController : ControllerBase
   public async Task<ActionResult<Question>> CreateQuestion(CreateQuestionDTO questionDTO)
   {
     _logger.LogInformation("CreateQuestion has been called.");
+    if (!ModelState.IsValid)
+    {
+      return BadRequest("Missing arguments");
+    }
 
     if (questionDTO == null) return BadRequest("Question data is null.");
     string? userId = User?.FindFirst("userId")?.Value;
