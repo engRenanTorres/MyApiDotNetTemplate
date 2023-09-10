@@ -28,11 +28,11 @@ namespace DotnetAPI.Helpers
       );
     }
 
-    public string TokenGenerator(int userId)
+    public string TokenGenerator(int userId, Roles roles)
     {
       var claims = new Claim[]{
       new Claim("userId", userId.ToString()),
-      new Claim("trampo", "Jeca")
+      new Claim("trampo", roles.ToString())
     };
       string? tokenKeyString = _configuration.GetSection("AppSettings:TokenKey").Value;
 

@@ -1,6 +1,5 @@
-using DotnetAPI.Data.Repositories;
 using DotnetAPI.DTOs;
-using DotnetAPI.Indentity;
+using DotnetAPI.Authorization;
 using DotnetAPI.Models;
 using DotnetAPI.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -11,7 +10,7 @@ namespace DotnetAPI.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-[AuthorizationLevel("Jeca2")]
+[AuthorizationLevel("Staff|Adm")]
 public class UserController : ControllerBase
 {
 

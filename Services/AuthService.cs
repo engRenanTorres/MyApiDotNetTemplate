@@ -3,6 +3,7 @@ using DotnetAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using DotnetAPI.Helpers;
 using DotnetAPI.Data.Repositories;
+using DotnetAPI.Enums;
 
 namespace DotnetAPI.Services;
 
@@ -41,14 +42,14 @@ public class AuthService : IAuthService
         return null;
       }
     }
-    var token = _authHelper.TokenGenerator(user.Id);
+    var token = _authHelper.TokenGenerator(user.Id, user.Role);
     return token;
   }
 
-  public string? RefreshToken(string? authUserId)
+  public string? RefreshToken(string? authUserId, Roles role)
   {
     if (authUserId == null) return null;
-    var token = _authHelper.TokenGenerator(int.Parse(authUserId));
+    var token = _authHelper.TokenGenerator(int.Parse(authUserId), role);
     return token;
   }
 

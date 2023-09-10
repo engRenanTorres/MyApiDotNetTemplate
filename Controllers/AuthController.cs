@@ -13,18 +13,18 @@ namespace DotnetAPI.Controllers;
 [Authorize]
 public class AuthController : ControllerBase
 {
-  private readonly IUserRepository _userRepository;
+  private readonly IUserService _userService;
   private readonly IAuthService _AuthService;
   private readonly ILogger<AuthController> _logger;
   private readonly AuthHelper _authHelper;
   public AuthController(
     ILogger<AuthController> logger,
-    IUserRepository userRepository,
+    IUserService userService,
     IConfiguration configuration,
     IAuthService authService
   )
   {
-    _userRepository = userRepository;
+    _userService = userService;
     _logger = logger;
     _authHelper = new(configuration);
     _AuthService = authService;
@@ -59,10 +59,15 @@ public class AuthController : ControllerBase
   }
 
   [HttpGet("RefreshToken")]
-  public IActionResult RefreshToken()
+  public async Task<IActionResult> RefreshToken()
   {
     string? authUserId = User.FindFirst("UserId")?.Value;
-    var token = _AuthService.RefreshToken(authUserId);
+
+    if (authUserId == null) return BadRequest("UserId cannot be converted into int type");
+    User? user = await _userService.GetUser(int.Parse(authUserId));
+    if (user == null) return BadRequest("User does not exist");
+
+    var token = _AuthService.RefreshToken(authUserId, user.Role);
     if (token == null) return NotFound();
     return Ok(new Dictionary<string, string>{
       {"token", token},
